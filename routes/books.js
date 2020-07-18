@@ -1,20 +1,21 @@
 var express = require("express");
+const { asyncErrorHandler } = require("../middleware");
 var router = express.Router();
 
+const {
+    getAllBooks,
+    getBook,
+    postNewBook
+} = require("../controllers/books");
+
 /* GET books listing. */
-router.get("/", function (req, res, next) {
-  res.send("GET /books");
-});
+router.get("/", asyncErrorHandler(getAllBooks));
 
 /* GET book information */
-router.get("/:id", function (req, res, next) {
-  res.send("GET /books/:id");
-});
+router.get("/:id", asyncErrorHandler(getBook));
 
 /* POST create a new book */
-router.post("/", function (req, res, next) {
-  res.send("POST /books");
-});
+router.post("/", asyncErrorHandler(postNewBook));
 
 
 module.exports = router;
