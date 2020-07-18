@@ -15,4 +15,15 @@ router.get('/:id', function(req, res, next) {
 router.post('/', function(req, res, next) {
   res.send('POST /users');
 });
+
+/* POST borrow a book */
+router.post("/:userId/borrow/:bookId", function (req, res, next) {
+  res.send("POST /users/:userId/borrow/:bookId");
+});
+
+/* POST return a book */
+router.post("/:userId/borrow/:bookId", function (req, res, next) {
+  res.send("POST /users/:userId/borrow/:bookId");
+});
+
 module.exports = router;
