@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const db = require("../config/database");
+const User = require('./User');
 
 const Book = db.define("Book", {
     name: {
@@ -17,5 +18,8 @@ const Book = db.define("Book", {
 {
     timestamps: false
 }); 
+
+Book.sync();
+
 
 module.exports = Book;

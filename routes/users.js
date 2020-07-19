@@ -1,29 +1,28 @@
 var express = require('express');
 var router = express.Router();
 
+const { 
+    getAllUsers,
+    getUser,
+    postNewUser,
+    postBorrowBook,
+    postReturnBook 
+} = require("../controllers/users");
+const { asyncErrorHandler } = require('../middleware');
+
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('GET /users');
-});
+router.get('/', asyncErrorHandler(getAllUsers));
 
 /* GET user information */
-router.get('/:id', function(req, res, next) {
-  res.send('GET /users/:id');
-});
+router.get("/:id", asyncErrorHandler(getUser));
 
 /* POST create a new user */
-router.post('/', function(req, res, next) {
-  res.send('POST /users');
-});
+router.post("/", asyncErrorHandler(postNewUser));
 
 /* POST borrow a book */
-router.post("/:userId/borrow/:bookId", function (req, res, next) {
-  res.send("POST /users/:userId/borrow/:bookId");
-});
+router.post("/:userId/borrow/:bookId", asyncErrorHandler(postBorrowBook));
 
 /* POST return a book */
-router.post("/:userId/borrow/:bookId", function (req, res, next) {
-  res.send("POST /users/:userId/borrow/:bookId");
-});
+router.post("/:userId/return/:bookId", asyncErrorHandler(postReturnBook));
 
 module.exports = router;
