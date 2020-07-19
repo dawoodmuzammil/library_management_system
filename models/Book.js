@@ -14,12 +14,16 @@ const Book = db.define("Book", {
         type: DataTypes.REAL,
         defaultValue: 0.0
     },
+    on_loan: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 },
 {
     timestamps: false
 }); 
 
-Book.sync();
+Book.sync({alter: true});
 
 
 module.exports = Book;

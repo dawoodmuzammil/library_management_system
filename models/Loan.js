@@ -9,16 +9,24 @@ const User = require("./User");
 
 const Loan = db.define(
   "Loan",
-  {
-    date_loaned: {
+  {    
+    loaned_at: {
       type: DataTypes.DATEONLY,
       allowNull: false,
       defaultValue: moment().format()
     },
-    date_returned: {
+    returned_at: {
         type: DataTypes.DATEONLY,
         allowNull: true,
         defaultValue: null
+    },
+    ratings: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        validate: {
+            min: 0,
+            max: 10
+        }
     }
   },
   {
@@ -26,9 +34,9 @@ const Loan = db.define(
   }
 );
 
-Loan.sync();
+User.belongsToMany(Book, { through: Loan, foreignKey: 'userId' });
+Book.belongsToMany(User, { through: Loan, foreignKey: "bookId" });
+Loan.sync({alter: true});
 
-User.belongsToMany(Book, { through: Loan });
-Book.belongsToMany(User, { through: Loan });
 
 module.exports = Loan;
