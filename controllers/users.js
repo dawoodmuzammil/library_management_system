@@ -5,25 +5,41 @@ const Book = require("../models/Book");
 const moment = require("moment");
 
 module.exports = {
+    // gets list of all users
     async getAllUsers(req, res, next) {
         var users = await User.findAll({
             include: [{
-                model: Book,
-                attributes: ['name', 'average_rating', 'on_loan'],
+                model: Book, // include data from Book model
+                attributes: ['name', 'average_rating', 'on_loan'], // include only these fields
                 group: 'on_loan',
                 through: {
-                    attributes: ['loaned_at', 'ratings']
+                    attributes: ['loaned_at', 'ratings'] // include these fields from Loan model
                 }                  
             }]
         });
+        // send as response
         res.send(users);
     },
 
+    // gets one user
     async getUser(req, res, next) {
-        var user = await User.findByPk(req.params.id);
+        var user = await User.findByPk(req.params.id, {
+          include: [
+            {
+              model: Book, // include data from Book model
+              attributes: ["name", "average_rating", "on_loan"], // include only these fields
+              group: "on_loan",
+              through: {
+                attributes: ["loaned_at", "ratings"], // include these fields from Loan model
+              },
+            },
+          ],
+        });
+        // send data as response
         res.send(user);
     },
 
+    // creates a new user and saves to database
     async postNewUser(req, res, next) {
         var newUser = {
         name: req.body.name,
@@ -31,17 +47,21 @@ module.exports = {
 
         let { name } = newUser;
 
-        await User.create({ name });
+        await User.create({ name }); // save to database
         res.redirect("/users");
     },
 
+    // lets a user to borrow a book which is not already loaned out
     async postBorrowBook(req, res, next) {
+        // retrieve book information
         var book = await Book.findByPk(req.params.bookId);
 
         // book already on loan
         if (book.on_loan) {
             res.status(500).send("Book already on loan.");
-        } else {
+        }
+        // book not on load i.e. book available 
+        else {
             var loanInstance = {
                 userId: req.params.userId,
                 bookId: req.params.bookId,
@@ -49,21 +69,28 @@ module.exports = {
 
             let { userId, bookId } = loanInstance;
 
+            // create an entry for the loaned book in LOANS table
             await Loan.create({ userId, bookId });
             var newLoanCount = book.loan_count + 1;
-            console.log(newLoanCount);
 
+            // update status of loaned book
             book.update({ on_loan: true, loan_count: newLoanCount });
             res.status(204).send("Loan successful");
         }
     },
 
+    // lets user to return a loaned book
     async postReturnBook(req, res, next) {        
+        // retrieve book information
         var book = await Book.findByPk(req.params.bookId);
+
+        // book was not loaned in the first place
         if (!book.on_loan) {
             res.status(500).send("Book was not on loan");
         }
-        else {            
+        // book was on loan
+        else {
+            // retrieve loan entry based on both the book and the user            
             var loanInstance = await Loan.findOne({
                 where: {
                     userId: req.params.userId,
